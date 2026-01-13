@@ -1,0 +1,412 @@
+{% comment %}
+  Hero 3D Scroll Section
+  A full-viewport hero with a 3D model that rotates based on scroll position.
+  Apple-inspired minimal design for Ritus & Potis.
+{% endcomment %}
+
+<section
+  id="Hero3D-{{ section.id }}"
+  class="hero-3d-scroll color-{{ section.settings.color_scheme }}"
+  data-section-id="{{ section.id }}"
+  style="
+    --hero-3d-height: {{ section.settings.section_height }};
+    --hero-3d-bg: {{ section.settings.background_color }};
+    --hero-3d-text: {{ section.settings.text_color }};
+  "
+>
+  <div class="hero-3d-scroll__container">
+    <div class="hero-3d-scroll__model-wrapper">
+      <hero-3d-scroll-component
+        class="hero-3d-scroll__component"
+        data-rotation-speed="{{ section.settings.rotation_speed }}"
+        data-rotation-axis="{{ section.settings.rotation_axis }}"
+      >
+        {% liquid
+          if section.settings.model_url != blank
+            assign model_src = section.settings.model_url
+          else
+            comment
+              Placeholder: Google's astronaut model for testing
+              Replace with your product .glb file URL
+            endcomment
+            assign model_src = 'https://modelviewer.dev/shared-assets/models/Astronaut.glb'
+          endif
+        %}
+        <model-viewer
+          ref="model"
+          src="{{ model_src }}"
+          alt="{{ section.settings.model_alt | default: 'Product Preview' }}"
+          camera-orbit="{{ section.settings.initial_rotation }}deg 75deg auto"
+          camera-controls
+          disable-zoom
+          interaction-prompt="none"
+          shadow-intensity="{{ section.settings.shadow_intensity }}"
+          exposure="{{ section.settings.exposure }}"
+          {% if section.settings.auto_rotate_when_idle %}
+            auto-rotate
+            auto-rotate-delay="3000"
+          {% endif %}
+          style="width: 100%; height: 100%;"
+        >
+          <div class="hero-3d-scroll__loading" slot="poster">
+            <div class="hero-3d-scroll__loading-spinner"></div>
+          </div>
+        </model-viewer>
+      </hero-3d-scroll-component>
+    </div>
+
+    <div class="hero-3d-scroll__content">
+      <!-- Scrollable content area -->
+      <div class="hero-3d-scroll__scroll-container">
+        <!-- Page 1: Headline -->
+        <div class="hero-3d-scroll__page hero-3d-scroll__page--intro">
+          <div class="hero-3d-scroll__text">
+            {% if section.settings.headline != blank %}
+              <h1 class="hero-3d-scroll__headline">
+                {{ section.settings.headline }}
+              </h1>
+            {% endif %}
+
+            {% if section.settings.subheadline != blank %}
+              <p class="hero-3d-scroll__subheadline">
+                {{ section.settings.subheadline }}
+              </p>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_scroll_indicator %}
+            <div class="hero-3d-scroll__scroll-indicator">
+              <span class="hero-3d-scroll__scroll-text">{{ section.settings.scroll_text | default: 'Scroll to discover' }}</span>
+              <div class="hero-3d-scroll__scroll-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 5v14M5 12l7 7 7-7"/>
+                </svg>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Page 2: Ingredients Overview -->
+        <div class="hero-3d-scroll__page hero-3d-scroll__page--ingredients">
+          <h2 class="hero-3d-scroll__section-title">What's Inside</h2>
+          <p class="hero-3d-scroll__section-subtitle">Every ingredient chosen with precision. Nothing more, nothing less.</p>
+
+          {% for block in section.blocks %}
+            {% if block.type == 'ingredient' %}
+              <div class="hero-3d-scroll__ingredient" {{ block.shopify_attributes }}>
+                <div class="hero-3d-scroll__ingredient-header">
+                  <h3 class="hero-3d-scroll__ingredient-name">{{ block.settings.name }}</h3>
+                  <span class="hero-3d-scroll__ingredient-amount">{{ block.settings.amount }}</span>
+                </div>
+                <p class="hero-3d-scroll__ingredient-description">{{ block.settings.description }}</p>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- Page 3: Quality Promise -->
+        <div class="hero-3d-scroll__page hero-3d-scroll__page--quality">
+          <h2 class="hero-3d-scroll__section-title">Our Promise</h2>
+          <ul class="hero-3d-scroll__promises">
+            <li>Third-party tested</li>
+            <li>No artificial fillers</li>
+            <li>Clinically-backed dosages</li>
+            <li>Made in the USA</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    {% comment %} Fixed Buy Button {% endcomment %}
+    <div class="hero-3d-scroll__buy-button">
+      {% if section.settings.product != blank %}
+        {% assign product = section.settings.product %}
+        {% assign variant = product.selected_or_first_available_variant %}
+        <product-form-component
+          data-section-id="{{ section.id }}"
+          data-product-id="{{ product.id }}"
+          data-product-url="{{ product.url }}"
+        >
+          {%- form 'product', product, id: 'hero-buy-form', data-type: 'add-to-cart-form' -%}
+            <input type="hidden" name="id" value="{{ variant.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button
+              type="submit"
+              class="hero-3d-scroll__buy-btn"
+              {% unless variant.available %}disabled{% endunless %}
+            >
+              <span class="hero-3d-scroll__buy-text">
+                {%- if variant.available -%}
+                  {{ section.settings.buy_button_text | default: 'Buy' }} · {{ variant.price | money_without_trailing_zeros }}
+                {%- else -%}
+                  Sold Out
+                {%- endif -%}
+              </span>
+            </button>
+          {%- endform -%}
+        </product-form-component>
+      {% else %}
+        {% comment %} Placeholder button when no product selected {% endcomment %}
+        <button type="button" class="hero-3d-scroll__buy-btn" disabled>
+          <span class="hero-3d-scroll__buy-text">{{ section.settings.buy_button_text | default: 'Buy' }}</span>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script type="module" src="{{ 'hero-3d-scroll.js' | asset_url }}"></script>
+<link rel="stylesheet" href="{{ 'hero-3d-scroll.css' | asset_url }}">
+
+{% comment %} Load model-viewer from CDN {% endcomment %}
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+
+{% schema %}
+{
+  "name": "3D Scroll Hero",
+  "tag": "section",
+  "class": "hero-3d-scroll-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "buy_button_text",
+      "label": "Buy Button Text",
+      "default": "Buy"
+    },
+    {
+      "type": "header",
+      "content": "3D Model"
+    },
+    {
+      "type": "url",
+      "id": "model_url",
+      "label": "3D Model URL (.glb or .gltf)",
+      "info": "Upload your 3D model to Shopify Files and paste the URL here"
+    },
+    {
+      "type": "text",
+      "id": "model_alt",
+      "label": "Model Alt Text",
+      "default": "Product Preview"
+    },
+    {
+      "type": "range",
+      "id": "initial_rotation",
+      "label": "Initial Rotation",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "default": 0,
+      "unit": "deg"
+    },
+    {
+      "type": "range",
+      "id": "camera_distance",
+      "label": "Camera Distance",
+      "min": 1,
+      "max": 10,
+      "step": 0.5,
+      "default": 2.5,
+      "unit": "m"
+    },
+    {
+      "type": "range",
+      "id": "rotation_speed",
+      "label": "Scroll Rotation Speed",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 2,
+      "info": "How many full rotations over the scroll distance"
+    },
+    {
+      "type": "select",
+      "id": "rotation_axis",
+      "label": "Rotation Axis",
+      "default": "y",
+      "options": [
+        { "value": "y", "label": "Horizontal (Y-axis)" },
+        { "value": "x", "label": "Vertical (X-axis)" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate_when_idle",
+      "label": "Auto-rotate when idle",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "shadow_intensity",
+      "label": "Shadow Intensity",
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "exposure",
+      "label": "Lighting Exposure",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Your daily ritual. Elevated."
+    },
+    {
+      "type": "text",
+      "id": "subheadline",
+      "label": "Subheadline"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show scroll indicator",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "scroll_text",
+      "label": "Scroll indicator text",
+      "default": "Scroll to discover"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section Height",
+      "default": "100svh",
+      "options": [
+        { "value": "100svh", "label": "Full screen" },
+        { "value": "90svh", "label": "90% screen" },
+        { "value": "80svh", "label": "80% screen" },
+        { "value": "70svh", "label": "70% screen" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1D1D1F"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ingredient",
+      "name": "Ingredient",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Ingredient Name",
+          "default": "Vitamin D3"
+        },
+        {
+          "type": "text",
+          "id": "amount",
+          "label": "Amount",
+          "default": "2000 IU"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Supports immune function, bone health, and mood regulation."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "3D Scroll Hero",
+      "category": "Hero",
+      "settings": {
+        "headline": "Your daily ritual.\nElevated.",
+        "show_scroll_indicator": true,
+        "rotation_speed": 2
+      },
+      "blocks": [
+        {
+          "type": "ingredient",
+          "settings": {
+            "name": "Vitamin D3",
+            "amount": "2000 IU",
+            "description": "Supports immune function, bone health, and mood regulation. Most adults are deficient."
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "name": "Omega-3 (EPA/DHA)",
+            "amount": "1000mg",
+            "description": "Essential fatty acids for brain health, heart function, and reducing inflammation."
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "name": "Magnesium Glycinate",
+            "amount": "400mg",
+            "description": "The most bioavailable form. Supports sleep, muscle recovery, and stress response."
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "name": "Vitamin K2 (MK-7)",
+            "amount": "100mcg",
+            "description": "Works synergistically with D3 to direct calcium to bones, not arteries."
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "name": "Zinc Picolinate",
+            "amount": "15mg",
+            "description": "Highly absorbable zinc for immune support and cellular function."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

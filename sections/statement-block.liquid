@@ -1,0 +1,185 @@
+{% comment %}
+  Statement Block Section
+  Large typography statement for impactful brand messaging.
+  Apple-inspired minimal design.
+{% endcomment %}
+
+<section
+  id="Statement-{{ section.id }}"
+  class="statement-block color-{{ section.settings.color_scheme }}"
+  style="
+    --statement-bg: {{ section.settings.background_color }};
+    --statement-text: {{ section.settings.text_color }};
+    --statement-padding-top: {{ section.settings.padding_top }}px;
+    --statement-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="statement-block__container">
+    {% if section.settings.statement_text != blank %}
+      <p class="statement-block__text {% if section.settings.text_size == 'large' %}statement-block__text--large{% endif %}">
+        {{ section.settings.statement_text }}
+      </p>
+    {% endif %}
+
+    {% if section.settings.attribution != blank %}
+      <span class="statement-block__attribution">
+        {{ section.settings.attribution }}
+      </span>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .statement-block {
+    --statement-bg: #FAFAFA;
+    --statement-text: #1D1D1F;
+    --statement-text-muted: #86868B;
+    --statement-padding-top: 120px;
+    --statement-padding-bottom: 120px;
+
+    background-color: var(--statement-bg);
+    color: var(--statement-text);
+    padding: var(--statement-padding-top) 0 var(--statement-padding-bottom);
+  }
+
+  .statement-block__container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 clamp(24px, 6vw, 80px);
+    text-align: center;
+  }
+
+  .statement-block__text {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--statement-text);
+  }
+
+  .statement-block__text--large {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .statement-block__attribution {
+    display: block;
+    margin-top: clamp(24px, 4vh, 40px);
+    font-family: var(--font-body--family, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--statement-text-muted);
+  }
+
+  /* Dark mode support */
+  .statement-block.color-scheme-2,
+  .statement-block[data-color-scheme="dark"] {
+    --statement-bg: #1D1D1F;
+    --statement-text: #F5F5F7;
+    --statement-text-muted: #A1A1A6;
+  }
+
+  @media screen and (max-width: 749px) {
+    .statement-block {
+      --statement-padding-top: 80px;
+      --statement-padding-bottom: 80px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Statement Block",
+  "tag": "section",
+  "class": "statement-block-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "statement_text",
+      "label": "Statement",
+      "default": "What you put in your body should never be ordinary."
+    },
+    {
+      "type": "text",
+      "id": "attribution",
+      "label": "Attribution (optional)",
+      "info": "Add a source or tagline below the statement"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text Size",
+      "default": "normal",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "large", "label": "Large" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1D1D1F"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "default": 120,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "default": 120,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Statement Block",
+      "category": "Text",
+      "settings": {
+        "statement_text": "What you put in your body should never be ordinary.",
+        "text_size": "large"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,22 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer_utilities": {
+      "type": "footer-utilities",
+      "blocks": {
+        "block_copyright": {
+          "type": "footer-copyright",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "block_copyright"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "footer_utilities"
+  ]
+}

@@ -1,0 +1,130 @@
+{% comment %}
+  Product Duo Card
+  Renders a single product with image, info, and add-to-cart functionality.
+  Uses the existing product-form-component for cart integration.
+
+  @param {object} product - The product object
+  @param {object} section - The section object
+  @param {number} index - Product index (1 or 2)
+  @param {string} tagline - Custom tagline text
+  @param {string} description - Custom description text
+  @param {string} cta_text - Custom CTA button text
+{% endcomment %}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign can_add_to_cart = false
+  assign add_to_cart_text = 'products.product.unavailable' | t
+
+  if variant
+    if variant.available
+      assign can_add_to_cart = true
+      assign add_to_cart_text = cta_text | default: 'products.product.add_to_cart' | t
+    else
+      assign can_add_to_cart = false
+      assign add_to_cart_text = 'products.product.sold_out' | t
+    endif
+  endif
+
+  assign product_form_id = 'ProductDuo-Form-' | append: section.id | append: '-' | append: index
+  assign use_currency = settings.currency_code_enabled_product_pages
+%}
+
+<div class="product-duo-card" data-product-id="{{ product.id }}">
+  {% comment %} Product Image {% endcomment %}
+  <a href="{{ product.url }}" class="product-duo-card__media">
+    {% if product.featured_media %}
+      {{
+        product.featured_media
+        | image_url: width: 1200
+        | image_tag:
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 900px) 50vw, 100vw',
+          class: 'product-duo-card__image',
+          alt: product.featured_media.alt | default: product.title
+      }}
+    {% else %}
+      {{ 'product-1' | placeholder_svg_tag: 'product-duo-card__image product-duo-card__image--placeholder' }}
+    {% endif %}
+  </a>
+
+  {% comment %} Product Content {% endcomment %}
+  <div class="product-duo-card__content">
+    {% if tagline != blank %}
+      <span class="product-duo-card__tagline">{{ tagline }}</span>
+    {% endif %}
+
+    <h3 class="product-duo-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+
+    {% if description != blank %}
+      <p class="product-duo-card__description">{{ description }}</p>
+    {% endif %}
+
+    {% comment %} Price {% endcomment %}
+    <div class="product-duo-card__price">
+      {% if variant.compare_at_price > variant.price %}
+        <span class="product-duo-card__price-compare">
+          {% if use_currency %}
+            {{ variant.compare_at_price | money_with_currency }}
+          {% else %}
+            {{ variant.compare_at_price | money }}
+          {% endif %}
+        </span>
+      {% endif %}
+      <span class="product-duo-card__price-current">
+        {% if use_currency %}
+          {{ variant.price | money_with_currency }}
+        {% else %}
+          {{ variant.price | money }}
+        {% endif %}
+      </span>
+    </div>
+
+    {% comment %} Add to Cart Form - Using existing product-form-component {% endcomment %}
+    <div class="product-duo-card__form">
+      <product-form-component
+        data-section-id="{{ section.id }}"
+        data-product-id="{{ product.id }}"
+        data-product-url="{{ product.url }}"
+        on:submit="/handleSubmit"
+        data-quantity-default="1"
+        data-quantity-error-max="{{ 'products.product.quantity_error_max' | t }}"
+      >
+        <div
+          class="visually-hidden"
+          aria-live="assertive"
+          role="status"
+          aria-atomic="true"
+          ref="liveRegion"
+        ></div>
+
+        {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
+          <input
+            type="hidden"
+            name="id"
+            ref="variantId"
+            value="{{ variant.id }}"
+          >
+          <input
+            type="hidden"
+            name="quantity"
+            value="1"
+          >
+
+          <div class="product-form-buttons" ref="productFormButtons">
+            {% render 'add-to-cart-button',
+              id: product_form_id | append: '-submit',
+              class: 'add-to-cart-button button',
+              can_add_to_cart: can_add_to_cart,
+              product: product,
+              add_to_cart_text: add_to_cart_text,
+              data_testid: 'product-duo-add-to-cart'
+            %}
+          </div>
+        {%- endform -%}
+      </product-form-component>
+    </div>
+  </div>
+</div>

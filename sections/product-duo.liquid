@@ -1,0 +1,392 @@
+{% comment %}
+  Product Duo Section
+  Side-by-side display of two products with full cart functionality.
+  Apple-inspired minimal design for Ritus & Potis.
+{% endcomment %}
+
+{% liquid
+  assign product_1 = section.settings.product_1
+  assign product_2 = section.settings.product_2
+
+  if request.visual_preview_mode
+    if product_1 == blank
+      assign product_1 = collections.all.products[0]
+    endif
+    if product_2 == blank
+      assign product_2 = collections.all.products[1]
+    endif
+  endif
+%}
+
+<section
+  id="ProductDuo-{{ section.id }}"
+  class="product-duo color-{{ section.settings.color_scheme }}"
+  style="
+    --product-duo-bg: {{ section.settings.background_color }};
+    --product-duo-text: {{ section.settings.text_color }};
+    --product-duo-padding-top: {{ section.settings.padding_top }}px;
+    --product-duo-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="product-duo__container">
+    {% if section.settings.section_title != blank %}
+      <header class="product-duo__header">
+        <h2 class="product-duo__section-title">{{ section.settings.section_title }}</h2>
+      </header>
+    {% endif %}
+
+    <div class="product-duo__grid">
+      {% comment %} Product 1 - Ritus {% endcomment %}
+      <article class="product-duo__item">
+        {% if product_1 != blank %}
+          {% render 'product-duo-card',
+            product: product_1,
+            section: section,
+            index: 1,
+            tagline: section.settings.product_1_tagline,
+            description: section.settings.product_1_description,
+            cta_text: section.settings.product_1_cta
+          %}
+        {% else %}
+          <div class="product-duo__placeholder">
+            <p>Select a product</p>
+          </div>
+        {% endif %}
+      </article>
+
+      {% comment %} Product 2 - Potis {% endcomment %}
+      <article class="product-duo__item">
+        {% if product_2 != blank %}
+          {% render 'product-duo-card',
+            product: product_2,
+            section: section,
+            index: 2,
+            tagline: section.settings.product_2_tagline,
+            description: section.settings.product_2_description,
+            cta_text: section.settings.product_2_cta
+          %}
+        {% else %}
+          <div class="product-duo__placeholder">
+            <p>Select a product</p>
+          </div>
+        {% endif %}
+      </article>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-duo {
+    --product-duo-bg: #FAFAFA;
+    --product-duo-text: #1D1D1F;
+    --product-duo-text-muted: #86868B;
+    --product-duo-padding-top: 120px;
+    --product-duo-padding-bottom: 120px;
+
+    background-color: var(--product-duo-bg);
+    color: var(--product-duo-text);
+    padding: var(--product-duo-padding-top) 0 var(--product-duo-padding-bottom);
+  }
+
+  .product-duo__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(24px, 6vw, 80px);
+  }
+
+  .product-duo__header {
+    text-align: center;
+    margin-bottom: clamp(60px, 10vh, 100px);
+  }
+
+  .product-duo__section-title {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--product-duo-text);
+  }
+
+  .product-duo__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(60px, 10vw, 120px);
+  }
+
+  @media screen and (min-width: 900px) {
+    .product-duo__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 80px);
+    }
+  }
+
+  .product-duo__item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-duo__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 12px;
+    color: var(--product-duo-text-muted);
+  }
+
+  /* Product Card Styles */
+  .product-duo-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .product-duo-card__media {
+    position: relative;
+    aspect-ratio: 1;
+    margin-bottom: clamp(24px, 4vh, 40px);
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.02);
+  }
+
+  .product-duo-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .product-duo-card:hover .product-duo-card__image {
+    transform: scale(1.02);
+  }
+
+  .product-duo-card__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .product-duo-card__tagline {
+    font-family: var(--font-body--family, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--product-duo-text-muted);
+    margin: 0 0 8px 0;
+  }
+
+  .product-duo-card__title {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 16px 0;
+    color: var(--product-duo-text);
+  }
+
+  .product-duo-card__description {
+    font-family: var(--font-body--family, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif);
+    font-size: 1.125rem;
+    line-height: 1.5;
+    color: var(--product-duo-text-muted);
+    margin: 0 0 clamp(24px, 4vh, 40px) 0;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .product-duo-card__price {
+    font-family: var(--font-body--family, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--product-duo-text);
+    margin: 0 0 clamp(16px, 3vh, 24px) 0;
+  }
+
+  .product-duo-card__price-compare {
+    text-decoration: line-through;
+    color: var(--product-duo-text-muted);
+    margin-right: 8px;
+  }
+
+  /* Form Styles */
+  .product-duo-card__form {
+    margin-top: auto;
+  }
+
+  .product-duo-card .product-form-buttons {
+    justify-content: center;
+  }
+
+  .product-duo-card .add-to-cart-button {
+    min-width: 200px;
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border-radius: 980px; /* Apple-style pill button */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .product-duo-card .add-to-cart-button:hover:not(:disabled) {
+    transform: scale(1.02);
+  }
+
+  /* Dark mode support */
+  .product-duo.color-scheme-2,
+  .product-duo[data-color-scheme="dark"] {
+    --product-duo-bg: #1D1D1F;
+    --product-duo-text: #F5F5F7;
+    --product-duo-text-muted: #A1A1A6;
+  }
+
+  @media screen and (max-width: 899px) {
+    .product-duo {
+      --product-duo-padding-top: 80px;
+      --product-duo-padding-bottom: 80px;
+    }
+
+    .product-duo-card__content {
+      padding: 0 clamp(16px, 4vw, 32px);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Duo",
+  "tag": "section",
+  "class": "product-duo-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title"
+    },
+    {
+      "type": "header",
+      "content": "Product 1 (Ritus)"
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "product_1_tagline",
+      "label": "Tagline",
+      "default": "Daily"
+    },
+    {
+      "type": "textarea",
+      "id": "product_1_description",
+      "label": "Description",
+      "default": "Pure foundation. Zero compromise."
+    },
+    {
+      "type": "text",
+      "id": "product_1_cta",
+      "label": "Button Text",
+      "default": "Add to Ritual"
+    },
+    {
+      "type": "header",
+      "content": "Product 2 (Potis)"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "product_2_tagline",
+      "label": "Tagline",
+      "default": "Daily + 120mg Caffeine"
+    },
+    {
+      "type": "textarea",
+      "id": "product_2_description",
+      "label": "Description",
+      "default": "Precision energy. Zero jitters."
+    },
+    {
+      "type": "text",
+      "id": "product_2_cta",
+      "label": "Button Text",
+      "default": "Add to Ritual"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1D1D1F"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "default": 120,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "default": 120,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Duo",
+      "category": "Products",
+      "settings": {
+        "product_1_tagline": "Daily",
+        "product_1_description": "Pure foundation. Zero compromise.",
+        "product_1_cta": "Add to Ritual",
+        "product_2_tagline": "Daily + 120mg Caffeine",
+        "product_2_description": "Precision energy. Zero jitters.",
+        "product_2_cta": "Add to Ritual"
+      }
+    }
+  ]
+}
+{% endschema %}
