@@ -1,0 +1,171 @@
+{% comment %}
+  Cart Upsell Section - "Complete your stack"
+  Simple, minimal product suggestions for 2-product store
+{% endcomment %}
+
+{% if section.settings.collection != blank %}
+  {% assign products = section.settings.collection.products %}
+{% else %}
+  {% assign products = collections.all.products | slice: 0, 2 %}
+{% endif %}
+
+{% if products.size > 0 %}
+<section class="cart-upsell">
+  <div class="cart-upsell__container">
+    <h2 class="cart-upsell__title">{{ section.settings.title | default: 'Complete your stack' }}</h2>
+
+    <div class="cart-upsell__products">
+      {% for product in products limit: 2 %}
+        {% comment %} Skip if product is already in cart {% endcomment %}
+        {% assign in_cart = false %}
+        {% for item in cart.items %}
+          {% if item.product.id == product.id %}
+            {% assign in_cart = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+
+        <a href="{{ product.url }}" class="cart-upsell__product{% if in_cart %} cart-upsell__product--in-cart{% endif %}">
+          {% if product.featured_image %}
+            <div class="cart-upsell__product-image">
+              {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy' }}
+            </div>
+          {% endif %}
+
+          <div class="cart-upsell__product-info">
+            <h3 class="cart-upsell__product-title">{{ product.title }}</h3>
+            <p class="cart-upsell__product-price">{{ product.price | money }}</p>
+            {% if in_cart %}
+              <span class="cart-upsell__in-cart-badge">In cart</span>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<style>
+  .cart-upsell {
+    --upsell-bg: #FAFAFA;
+    --upsell-text: #1D1D1F;
+    --upsell-text-muted: #86868B;
+
+    background: var(--upsell-bg);
+    padding: 60px 24px 80px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  }
+
+  .cart-upsell__container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .cart-upsell__title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+    color: var(--upsell-text);
+  }
+
+  .cart-upsell__products {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .cart-upsell__product {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--upsell-text);
+    transition: opacity 0.2s ease;
+  }
+
+  .cart-upsell__product:hover {
+    opacity: 0.8;
+  }
+
+  .cart-upsell__product--in-cart {
+    opacity: 0.5;
+  }
+
+  .cart-upsell__product-image {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f0f0f0;
+    margin-bottom: 16px;
+  }
+
+  .cart-upsell__product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cart-upsell__product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cart-upsell__product-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--upsell-text);
+  }
+
+  .cart-upsell__product-price {
+    font-size: 0.9rem;
+    color: var(--upsell-text-muted);
+    margin: 0;
+  }
+
+  .cart-upsell__in-cart-badge {
+    font-size: 0.75rem;
+    color: var(--upsell-text-muted);
+    margin-top: 4px;
+  }
+
+  @media screen and (max-width: 480px) {
+    .cart-upsell {
+      padding: 40px 20px 60px;
+    }
+
+    .cart-upsell__products {
+      gap: 16px;
+    }
+
+    .cart-upsell__product-image {
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cart Upsell",
+  "tag": "section",
+  "class": "cart-upsell-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Complete your stack"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select a collection with your products"
+    }
+  ]
+}
+{% endschema %}

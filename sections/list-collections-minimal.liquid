@@ -1,0 +1,207 @@
+{% comment %}
+  Minimal List Collections Section
+  Clean display of all collections
+{% endcomment %}
+
+<section class="collections-minimal">
+  <div class="collections-minimal__container">
+    <header class="collections-minimal__header">
+      <h1 class="collections-minimal__title">Collections</h1>
+    </header>
+
+    {% if collections.size > 0 %}
+      <div class="collections-minimal__grid">
+        {% for collection in collections %}
+          {% if collection.products.size > 0 %}
+            <a href="{{ collection.url }}" class="collections-minimal__item">
+              <div class="collections-minimal__item-image">
+                {% if collection.image %}
+                  {{ collection.image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+                {% elsif collection.products.first.featured_image %}
+                  {{ collection.products.first.featured_image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+                {% else %}
+                  <div class="collections-minimal__placeholder"></div>
+                {% endif %}
+              </div>
+              <div class="collections-minimal__item-info">
+                <h2 class="collections-minimal__item-title">{{ collection.title }}</h2>
+                <p class="collections-minimal__item-count">{{ collection.products.size }} {{ collection.products.size | pluralize: 'product', 'products' }}</p>
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="collections-minimal__empty">
+        <p class="collections-minimal__empty-text">No collections yet.</p>
+        <a href="{{ routes.root_url }}" class="collections-minimal__empty-btn">Back to home</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .collections-minimal {
+    --col-bg: #FAFAFA;
+    --col-text: #1D1D1F;
+    --col-text-muted: #86868B;
+
+    min-height: 60vh;
+    background: var(--col-bg);
+    color: var(--col-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  }
+
+  .collections-minimal__container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  .collections-minimal__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .collections-minimal__title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--col-text);
+  }
+
+  .collections-minimal__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .collections-minimal__item {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--col-text);
+    transition: opacity 0.2s ease;
+  }
+
+  .collections-minimal__item:hover {
+    opacity: 0.85;
+  }
+
+  .collections-minimal__item-image {
+    aspect-ratio: 4/3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #f0f0f0;
+    margin-bottom: 16px;
+  }
+
+  .collections-minimal__item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .collections-minimal__item:hover .collections-minimal__item-image img {
+    transform: scale(1.02);
+  }
+
+  .collections-minimal__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  }
+
+  .collections-minimal__item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .collections-minimal__item-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .collections-minimal__item-count {
+    font-size: 0.9rem;
+    color: var(--col-text-muted);
+    margin: 0;
+  }
+
+  /* Empty State */
+  .collections-minimal__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .collections-minimal__empty-text {
+    font-size: 1.1rem;
+    color: var(--col-text-muted);
+    margin: 0 0 24px;
+  }
+
+  .collections-minimal__empty-btn {
+    display: inline-flex;
+    padding: 14px 28px;
+    background: var(--col-text);
+    color: var(--col-bg);
+    border-radius: 980px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .collections-minimal__empty-btn:hover {
+    transform: scale(1.03);
+  }
+
+  /* Single collection - center it */
+  .collections-minimal__grid:has(> :only-child) {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  @media screen and (max-width: 600px) {
+    .collections-minimal__container {
+      padding: 40px 20px 80px;
+    }
+
+    .collections-minimal__header {
+      margin-bottom: 40px;
+    }
+
+    .collections-minimal__grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .collections-minimal__item-image {
+      border-radius: 12px;
+    }
+
+    .collections-minimal__item-title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Minimal Collections List",
+  "tag": "section",
+  "class": "collections-minimal-section"
+}
+{% endschema %}
