@@ -21,7 +21,7 @@ class Hero3DScrollComponent extends HTMLElement {
     this.smoothing = 0.12; // Lower = smoother but slower
 
     // Model rotation
-    this.targetRotation = 90;
+    this.targetRotation = 0;
     this.initialOrbit = { theta: 0, phi: 75, radius: 'auto' };
 
     // Animation loop
