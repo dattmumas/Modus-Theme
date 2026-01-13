@@ -33,7 +33,7 @@ class Hero3DScrollComponent extends HTMLElement {
     if (!this.section) return;
 
     this.scrollContainer = this.section.querySelector('.hero-3d-scroll__scroll-container');
-    this.targetRotation = parseFloat(this.dataset.targetRotation) || 90;
+    this.targetRotation = parseFloat(this.dataset.targetRotation) || 0;
 
     this.init();
   }
